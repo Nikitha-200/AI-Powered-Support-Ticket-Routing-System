@@ -5,6 +5,9 @@ import axios from 'axios';
 const { Title } = Typography;
 const { Option } = Select;
 
+// 🔥 Backend API URL
+const API_URL = process.env.REACT_APP_API_URL;
+
 const Dashboard = () => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -12,7 +15,7 @@ const Dashboard = () => {
   const fetchTickets = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/tickets');
+      const response = await axios.get(`${API_URL}/api/tickets`);
       setTickets(response.data);
     } catch (error) {
       message.error('Failed to fetch tickets');
@@ -29,7 +32,7 @@ const Dashboard = () => {
 
   const handleStatusChange = async (id, status) => {
     try {
-      await axios.patch(`http://localhost:5000/api/tickets/${id}`, { status });
+      await axios.patch(`${API_URL}/api/tickets/${id}`, { status });
       message.success('Status updated');
       fetchTickets();
     } catch (error) {
@@ -61,7 +64,11 @@ const Dashboard = () => {
       dataIndex: 'status',
       key: 'status',
       render: (status, record) => (
-        <Select defaultValue={status} style={{ width: 140 }} onChange={(value) => handleStatusChange(record._id, value)}>
+        <Select
+          defaultValue={status}
+          style={{ width: 140 }}
+          onChange={(value) => handleStatusChange(record._id, value)}
+        >
           <Option value="Open">Open</Option>
           <Option value="In Progress">In Progress</Option>
           <Option value="Resolved">Resolved</Option>
@@ -88,30 +95,34 @@ const Dashboard = () => {
 
       <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
         <Col xs={24} md={8}>
-          <Card style={{ boxShadow: '0 6px 20px rgba(0,0,0,0.06)' }}>
+          <Card>
             <Statistic title="Total Tickets" value={stats.total} />
           </Card>
         </Col>
         <Col xs={24} md={8}>
-          <Card style={{ boxShadow: '0 6px 20px rgba(0,0,0,0.06)' }}>
+          <Card>
             <Statistic title="Open Tickets" value={stats.open} valueStyle={{ color: '#cf1322' }} />
           </Card>
         </Col>
         <Col xs={24} md={8}>
-          <Card style={{ boxShadow: '0 6px 20px rgba(0,0,0,0.06)' }}>
+          <Card>
             <Statistic title="High Priority" value={stats.highPriority} valueStyle={{ color: '#fa541c' }} />
           </Card>
         </Col>
       </Row>
 
-      <Card style={{ boxShadow: '0 6px 20px rgba(0,0,0,0.06)' }}>
+      <Card>
         <Table
           columns={columns}
           dataSource={tickets}
           rowKey="_id"
           loading={loading}
           pagination={{ pageSize: 8 }}
-          expandable={{ expandedRowRender: (record) => <p style={{ margin: 0 }}>{record.description}</p> }}
+          expandable={{
+            expandedRowRender: (record) => (
+              <p style={{ margin: 0 }}>{record.description}</p>
+            )
+          }}
         />
       </Card>
     </div>
